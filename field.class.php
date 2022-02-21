@@ -133,7 +133,7 @@ class profile_field_verydynamicautocomplete extends profile_field_base {
         if(empty($data)){
             return null;
         }
-        $data = array_filter($data);
+        $data = array_values(array_filter($data));
         return json_encode($data);
     }
 
