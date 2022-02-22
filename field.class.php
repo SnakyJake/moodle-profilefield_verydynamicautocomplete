@@ -130,9 +130,6 @@ class profile_field_verydynamicautocomplete extends profile_field_base {
      */
     public function edit_save_data_preprocess($data, $datarecord)
     {
-        if(empty($data)){
-            return null;
-        }
         $data = array_values(array_filter($data));
         return json_encode($data);
     }
