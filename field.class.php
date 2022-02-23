@@ -78,10 +78,14 @@ class profile_field_verydynamicautocomplete extends profile_field_base {
                 $data = json_decode($option->data);
                 if(is_array($data)){
                     foreach($data as $value){
-                        $this->autocomplete[$value] = $value;
+                        if(!empty($value)){
+                            $this->autocomplete[$value] = $value;
+                        }
                     }
                 } else {
-                    $this->autocomplete[$data] = $data;
+                    if(!empty($data)){
+                        $this->autocomplete[$data] = $data;
+                    }
                 }
             }
         }
