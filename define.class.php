@@ -48,9 +48,26 @@ class profile_define_verydynamicautocomplete extends profile_define_base
         $form->setType('param1', PARAM_TEXT);
         $form->addHelpButton('param1', 'param1sqlqueryhelp', 'profilefield_verydynamicautocomplete');
 
+        $systemcontext = context_system::instance();
+        $systemroles = get_roles_for_contextlevels(CONTEXT_SYSTEM);
+        $roles = role_fix_names(get_all_roles($systemcontext), $systemcontext, ROLENAME_ORIGINAL);
+        $autocompletes = [];
+        foreach($roles as $role){
+            if(array_search($role->id,$systemroles)){
+                $autocompletes[$role->id] = $role->localname;
+            }
+        }
+
+        // param2 the roles that may add values.
+        $form->addElement('autocomplete', 'param2', get_string('param2tagroles', 'profilefield_verydynamicautocomplete'),$autocompletes,[
+            'tags' => false,
+            'multiple' => true,
+        ]);
+        $form->setType('param2', PARAM_TEXT);
+        $form->addHelpButton('param2', 'param2tagroleshelp', 'profilefield_verydynamicautocomplete');
+
         // Let's see if the user can modify the sql.
-        $context = context_system::instance();
-        $hascap = has_capability('profilefield/verydynamicautocomplete:caneditsql', $context);
+        $hascap = has_capability('profilefield/verydynamicautocomplete:caneditsql', $systemcontext);
 
         if (!$hascap) {
             $form->hardFreeze('param1');
@@ -163,6 +180,10 @@ class profile_define_verydynamicautocomplete extends profile_define_base
      */
     public function define_save_preprocess($data) {
         $data->param1 = str_replace("\r", '', $data->param1);
+        
+        if(!empty($data->param2)){
+            $data->param2 = implode(",",array_map("intval",$data->param2));
+        }
         return $data;
     }
 

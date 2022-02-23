@@ -78,10 +78,14 @@ class profile_field_verydynamicautocomplete extends profile_field_base {
                 $data = json_decode($option->data);
                 if(is_array($data)){
                     foreach($data as $value){
-                        $this->autocomplete[$value] = $value;
+                        if(!empty($value)){
+                            $this->autocomplete[$value] = $value;
+                        }
                     }
                 } else {
-                    $this->autocomplete[$data] = $data;
+                    if(!empty($data)){
+                        $this->autocomplete[$data] = $data;
+                    }
                 }
             }
         }
@@ -93,10 +97,12 @@ class profile_field_verydynamicautocomplete extends profile_field_base {
      * @param mixed $data
      * @param int $dataformat
      */
+    /*
     public function set_user_data($data, $dataformat) {
         $this->data = json_decode($data);
         $this->dataformat = $dataformat;
     }
+    */
 
     /**
      * Old syntax of class constructor. Deprecated in PHP7.
@@ -113,8 +119,20 @@ class profile_field_verydynamicautocomplete extends profile_field_base {
      * @param moodleform $mform Moodle form instance
      */
     public function edit_field_add($mform) {
+        global $USER;
+        $haswritecap = is_siteadmin();
+        if(!$haswritecap){
+            $writable_roles = explode(",",$this->field->param2);
+            $userroles = get_user_roles(context_system::instance(),$USER->id);
+            foreach($userroles as $role){
+                if(in_array($role->roleid,$writable_roles)){
+                    $haswritecap = true;
+                    break;
+                }
+            }
+        }
         $options = [
-            'tags' => true,
+            'tags' => $haswritecap,
             'multiple' => true,
         ];
         $mform->addElement('autocomplete', $this->inputname, format_string($this->field->name), $this->autocomplete, $options);
@@ -131,7 +149,23 @@ class profile_field_verydynamicautocomplete extends profile_field_base {
     public function edit_save_data_preprocess($data, $datarecord)
     {
         $data = array_values(array_filter($data));
-        return json_encode($data);
+        if(empty($data)){
+            return null;
+        } else {
+            return json_encode($data);
+        }
+    }
+
+    /**
+     * When passing the user object to the form class for the edit profile page
+     * we should load the key for the saved data
+     * Overwrites the base class method.
+     *
+     * @param   object   user object
+     */
+    public function edit_load_user_data($user)
+    {
+        $user->{$this->inputname} = implode("\n",json_decode($this->data));
     }
 
     /**
@@ -156,22 +190,25 @@ class profile_field_verydynamicautocomplete extends profile_field_base {
      * @return int options key for the menu
      */
     public function convert_external_data($value) {
-        $data = explode("\n",str_ireplace(["\r\n","\r",'\r','\n'],"\n",$value));
-        return json_encode($data);
+        if(is_array($value)){
+            return $value;
+        } else {
+            return explode("\n",str_ireplace(["\r\n","\r",'\r','\n'],"\n",$value));
+        }
     }
 
     /**
      * Display the data for this field.
      */
     public function display_data() {
-        if(!is_array($this->data)){
+        if(empty($this->data)){
             return get_string("none");
         }
-
-        $sql = $this->field->param1;
+        $data = json_decode($this->data);
+ 
         $string = '';
-        foreach($this->data as $data) {
-            $string .= ($string?"<br>":"").$data;
+        foreach($data as $value) {
+            $string .= ($string?"<br>":"").$value;
         }
         return $string?format_text($string):get_string("none");
     }
