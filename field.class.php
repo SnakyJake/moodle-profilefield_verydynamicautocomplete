@@ -131,7 +131,11 @@ class profile_field_verydynamicautocomplete extends profile_field_base {
     public function edit_save_data_preprocess($data, $datarecord)
     {
         $data = array_values(array_filter($data));
-        return json_encode($data);
+        if(empty($data)){
+            return "";
+        } else {
+            return json_encode($data);
+        }
     }
 
     /**
@@ -156,8 +160,11 @@ class profile_field_verydynamicautocomplete extends profile_field_base {
      * @return int options key for the menu
      */
     public function convert_external_data($value) {
-        $data = explode("\n",str_ireplace(["\r\n","\r",'\r','\n'],"\n",$value));
-        return json_encode($data);
+        if(is_array($value)){
+            return $value;
+        } else {
+            return explode("\n",str_ireplace(["\r\n","\r",'\r','\n'],"\n",$value));
+        }
     }
 
     /**
