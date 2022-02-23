@@ -113,8 +113,20 @@ class profile_field_verydynamicautocomplete extends profile_field_base {
      * @param moodleform $mform Moodle form instance
      */
     public function edit_field_add($mform) {
+        global $USER;
+        $haswritecap = is_siteadmin();
+        if(!$haswritecap){
+            $writable_roles = explode(",",$this->field->param2);
+            $userroles = get_user_roles(context_system::instance(),$USER->id);
+            foreach($userroles as $role){
+                if(in_array($role->roleid,$writable_roles)){
+                    $haswritecap = true;
+                    break;
+                }
+            }
+        }
         $options = [
-            'tags' => true,
+            'tags' => $haswritecap,
             'multiple' => true,
         ];
         $mform->addElement('autocomplete', $this->inputname, format_string($this->field->name), $this->autocomplete, $options);
