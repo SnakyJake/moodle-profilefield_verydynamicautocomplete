@@ -150,7 +150,7 @@ class profile_field_verydynamicautocomplete extends profile_field_base {
     {
         $data = array_values(array_filter($data));
         if(empty($data)){
-            return null;
+            return "";
         } else {
             return json_encode($data);
         }
@@ -165,7 +165,7 @@ class profile_field_verydynamicautocomplete extends profile_field_base {
      */
     public function edit_load_user_data($user)
     {
-        $user->{$this->inputname} = implode("\n",json_decode($this->data));
+        $user->{$this->inputname} = json_decode($this->data);
     }
 
     /**
