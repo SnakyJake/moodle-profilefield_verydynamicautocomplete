@@ -97,13 +97,13 @@ class profile_field_verydynamicautocomplete extends profile_field_base {
      * @param mixed $data
      * @param int $dataformat
      */
-    /*
+    /*    
     public function set_user_data($data, $dataformat) {
         $this->data = json_decode($data);
         $this->dataformat = $dataformat;
     }
     */
-
+    
     /**
      * Old syntax of class constructor. Deprecated in PHP7.
      *
@@ -152,7 +152,7 @@ class profile_field_verydynamicautocomplete extends profile_field_base {
         if(empty($data)){
             return "";
         } else {
-            return json_encode($data);
+            return json_encode($data,JSON_NUMERIC_CHECK|JSON_UNESCAPED_UNICODE);
         }
     }
 
@@ -171,9 +171,8 @@ class profile_field_verydynamicautocomplete extends profile_field_base {
                 $user->{$this->inputname} = implode("\n",json_decode($this->data));
                 return;
             }
-            $user->{$this->inputname} = json_decode($this->data);
         }
-        $user->{$this->inputname} = $this->data;
+        $user->{$this->inputname} = is_string($this->data)?json_decode($this->data):$this->data;
     }
 
     /**
@@ -212,7 +211,7 @@ class profile_field_verydynamicautocomplete extends profile_field_base {
         if(empty($this->data)){
             return get_string("none");
         }
-        $data = json_decode($this->data);
+        $data = json_decode($this->data,true);
  
         $string = '';
         foreach($data as $value) {
