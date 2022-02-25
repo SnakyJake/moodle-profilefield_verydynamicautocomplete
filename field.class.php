@@ -165,7 +165,15 @@ class profile_field_verydynamicautocomplete extends profile_field_base {
      */
     public function edit_load_user_data($user)
     {
-        $user->{$this->inputname} = json_decode($this->data);
+        if(!empty($this->data)){
+            $result = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+            if(end($result)["function"] == "download_data"){
+                $user->{$this->inputname} = implode("\n",json_decode($this->data));
+                return;
+            }
+            $user->{$this->inputname} = json_decode($this->data);
+        }
+        $user->{$this->inputname} = $this->data;
     }
 
     /**
