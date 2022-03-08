@@ -152,6 +152,7 @@ class profile_field_verydynamicautocomplete extends profile_field_base {
         if(empty($data)){
             return "";
         } else {
+            sort($data);
             return json_encode($data,JSON_NUMERIC_CHECK|JSON_UNESCAPED_UNICODE);
         }
     }
@@ -212,6 +213,7 @@ class profile_field_verydynamicautocomplete extends profile_field_base {
             return get_string("none");
         }
         $data = json_decode($this->data,true);
+        sort($data);
  
         $string = '';
         foreach($data as $value) {
