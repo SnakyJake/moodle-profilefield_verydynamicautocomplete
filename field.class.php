@@ -148,12 +148,12 @@ class profile_field_verydynamicautocomplete extends profile_field_base {
      */
     public function edit_save_data_preprocess($data, $datarecord)
     {
-        $data = array_values(array_filter($data));
+        $data = array_map("strval",array_values(array_filter($data)));
         if(empty($data)){
             return "";
         } else {
             sort($data);
-            return json_encode($data,JSON_NUMERIC_CHECK|JSON_UNESCAPED_UNICODE);
+            return json_encode($data,JSON_UNESCAPED_UNICODE);
         }
     }
 
@@ -192,8 +192,6 @@ class profile_field_verydynamicautocomplete extends profile_field_base {
     /**
      * Convert external data (csv file) from value to key for processing later by edit_save_data_preprocess
      *
-     * not implemented
-     * 
      * @param string $value one of the values in menu options.
      * @return int options key for the menu
      */
