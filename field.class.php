@@ -55,7 +55,7 @@ class profile_field_verydynamicautocomplete extends profile_field_base {
                 $rs = self::$acalls[$mykey];
             } else {
                 $sql = $this->field->param1;
-                
+
                 global $DB;
                 if(verydynamicautocomplete_profilefield_fix_sql($sql, \core_user::get_user($userid))){
                     $rs = $DB->get_records_sql($sql);
@@ -65,7 +65,7 @@ class profile_field_verydynamicautocomplete extends profile_field_base {
                 } else {
                     $rs = $DB->get_records_sql($sql);
                 }
-                
+
                 self::$acalls[$mykey] = $rs;
             }
             $this->autocomplete = array();
@@ -97,13 +97,13 @@ class profile_field_verydynamicautocomplete extends profile_field_base {
      * @param mixed $data
      * @param int $dataformat
      */
-    /*    
+    /*
     public function set_user_data($data, $dataformat) {
         $this->data = json_decode($data);
         $this->dataformat = $dataformat;
     }
     */
-    
+
     /**
      * Old syntax of class constructor. Deprecated in PHP7.
      *
@@ -190,17 +190,20 @@ class profile_field_verydynamicautocomplete extends profile_field_base {
             // $mform->setConstant($this->inputname, format_string($this->data));
         }
     }
+
     /**
      * Convert external data (csv file) from value to key for processing later by edit_save_data_preprocess
      *
      * @param string $value one of the values in menu options.
-     * @return int options key for the menu
+     * @return array options key for the menu
      */
     public function convert_external_data($value) {
-        if(is_array($value)){
+        if(is_array($value)) {
             return $value;
         } else {
-            return explode("\n",str_ireplace(["\r\n","\r",'\r','\n'],"\n",$value));
+            $data = explode(';', str_replace(["\r\n","\r","\n",'\r\n','\r','\n'], ';', $value));
+            $data = array_map('trim', $data);
+            return $data;
         }
     }
 
@@ -213,7 +216,7 @@ class profile_field_verydynamicautocomplete extends profile_field_base {
         }
         $data = json_decode($this->data,true);
         sort($data);
- 
+
         $string = '';
         foreach($data as $value) {
             $string .= ($string?"<br>":"").$value;
